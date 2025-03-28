@@ -1,0 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: UseNode@1
+  inputs:
+    version: '14.2.x'
+  displayName: 'Use Node.js 14.x'
+
+
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'SonarQubeServiceConnection'  # Name of your SonarQube service connection in Azure DevOps
+    scannerMode: 'CLI'  # Use SonarQube scanner in CLI mode
+    configMode: 'file'  # Use a configuration file for the SonarQube analysis
+    configFile: 'sonar-project.properties'  # Path to the SonarQube configuration file (if available)
+  displayName: 'Prepare SonarQube Analysis'
+
+# Run the SonarQube analysis
+- task: SonarQubeAnalyze@5
+  displayName: 'Run SonarQube Analysis'
+
+# Publish the SonarQube Quality Gate results
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'  # Timeout for polling the Quality Gate status (adjust as necessary)
+  displayName: 'Publish SonarQube Quality Gate Results'
+
